@@ -1748,7 +1748,7 @@ static int hls_read_header(AVFormatContext *s, AVDictionary **options)
             continue;
 
         pls->cur_seq_no = select_cur_seq_no(c, pls);
-        highest_cur_seq_no = FFMAX(highest_cur_seq_no, pls->cur_seq_no);
+        highest_cur_seq_no = FFMAX(highest_cur_seq_no, pls->cur_seq_no) + 2;
     }
 
     /* Open the demuxer for each playlist */
@@ -1775,10 +1775,7 @@ static int hls_read_header(AVFormatContext *s, AVDictionary **options)
          * all active streams within the first few seconds). This is not very generic,
          * though, as the sequence numbers are technically independent.
          */
-        if (!pls->finished && pls->cur_seq_no == highest_cur_seq_no - 1 &&
-            highest_cur_seq_no < pls->start_seq_no + pls->n_segments) {
-            pls->cur_seq_no = highest_cur_seq_no;
-        }
+        pls->cur_seq_no = highest_cur_seq_no;
 
         pls->read_buffer = av_malloc(INITIAL_BUFFER_SIZE);
         if (!pls->read_buffer){
